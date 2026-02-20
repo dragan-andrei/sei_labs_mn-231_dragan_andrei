@@ -17,6 +17,8 @@
 
 #define WAIT_TIME_MS 5000
 
+#define LCD_I2C_ADDRESS 0x27
+
 typedef enum {
     KEYPAD_KEY_1=23,
     KEYPAD_KEY_2=25,
