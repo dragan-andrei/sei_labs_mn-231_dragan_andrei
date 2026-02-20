@@ -21,11 +21,11 @@ void ctrl_interfone_update(void) {
     scanf("%4s", input_data);
 
     if (strcmp(input_data, USER_PASSWORD) == 0) {
-        printf("Access granted!\n");
+        printf("Access granted!     \n");
         dd_led_set_on(&green_led);
         dd_led_set_off(&red_led);
     } else {
-        printf("Access denied!\n");
+        printf("Access denied!      \n");
         dd_led_set_on(&red_led);
         dd_led_set_off(&green_led);
     }
