@@ -18,6 +18,19 @@
 
 #define WAIT_TIME_MS 5000
 
+
+// Button pins from diagram.json
+#define BUTTON_PIN_1 11   // btn1 -> mega:11 (green)
+#define BUTTON_PIN_2 10   // btn2 -> mega:10 (green)
+#define BUTTON_PIN_3 9    // btn3 -> mega:9  (green)
+
+
+#define BUTTON_LED_TASK_OFFSET_MS 1
+#define BUTTON_LED_TASK_RECURRANCE_MS 50
+
+#define RED_LED_TASK_OFFSET_MS 5
+#define RED_LED_TASK_RECURRANCE_MS 100
+
 typedef enum {
     KEYPAD_KEY_1=23,
     KEYPAD_KEY_2=25,

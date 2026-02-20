@@ -1,12 +1,14 @@
 #ifndef dd_led_h
 #define dd_led_h
 
+#define DD_LED_OUTPUT 0x01    
+
 #include <Arduino.h>
 #include <stdlib.h>
 
 typedef enum {
-  dd_led_off = 0,
-  dd_led_on = 1,
+  DD_LED_OFF = 0,
+  DD_LED_ON = 1,
 } dd_led_state_t;
 
 typedef struct {
