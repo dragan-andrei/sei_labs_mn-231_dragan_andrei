@@ -8,6 +8,7 @@
 #define LED_GREEN_PIN 15
 #define LCD_COLS 16
 #define LCD_ROWS 2
+#define LCD_I2C_ADDRESS 0x27
 
 #define INPUT_BUFFER_SIZE 100
 #define USER_PASSWORD "1234"
