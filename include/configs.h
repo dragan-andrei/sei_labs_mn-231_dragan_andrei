@@ -20,24 +20,15 @@
 #define LCD_I2C_ADDRESS 0x27
 
 typedef enum {
-    KEYPAD_KEY_1=23,
-    KEYPAD_KEY_2=25,
-    KEYPAD_KEY_3=27,  
-    KEYPAD_KEY_4=29,
-    KEYPAD_KEY_5=31,
-    KEYPAD_KEY_6=33,
-    KEYPAD_KEY_7=35,
-    KEYPAD_KEY_8=37,     
+    KEYPAD_PIN_1=23,
+    KEYPAD_PIN_2=25,
+    KEYPAD_PIN_3=27,  
+    KEYPAD_PIN_4=29,
+    KEYPAD_PIN_5=31,
+    KEYPAD_PIN_6=33,
+    KEYPAD_PIN_7=35,
+    KEYPAD_PIN_8=37,     
 }keypad_pin_t;
 
-// Row and column pin numbers for Keypad library
-#define KEYPAD_PIN_1 23
-#define KEYPAD_PIN_2 25
-#define KEYPAD_PIN_3 27
-#define KEYPAD_PIN_4 29
-#define KEYPAD_PIN_5 31
-#define KEYPAD_PIN_6 33
-#define KEYPAD_PIN_7 35
-#define KEYPAD_PIN_8 37
 
 #endif // CONFIGS_H
