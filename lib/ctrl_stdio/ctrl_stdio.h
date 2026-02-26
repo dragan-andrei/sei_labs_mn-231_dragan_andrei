@@ -14,6 +14,9 @@
 void ctrl_stdio_serial_init(void);
 void ctrl_stdio_lcd_keypad_init(void);
 
+// move LCD cursor to given column/row (0-based)
+void ctrl_stdio_set_cursor(uint8_t col, uint8_t row);
+
 
 #endif
 

@@ -38,6 +38,18 @@ int ctrl_stdio_lcd_putchar(char ch, FILE* f)
         lcd_row = (lcd_row + 1) % LCD_ROWS;
         lcd.setCursor(lcd_col, lcd_row);
     }
+    // handle backspace by erasing previous character on LCD
+    else if (ch == '\b') {
+        if (lcd_col > 0) {
+            lcd_col--;
+        } else if (lcd_row > 0) {
+            lcd_row--;
+            lcd_col = LCD_COLS - 1;
+        }
+        lcd.setCursor(lcd_col, lcd_row);
+        lcd.print(' ');               // overwrite with space
+        lcd.setCursor(lcd_col, lcd_row);
+    } 
     else {
         lcd.print(ch);
         if (++lcd_col >= LCD_COLS) {
@@ -102,4 +114,14 @@ void ctrl_stdio_lcd_keypad_init()
                       ctrl_stdio_keypad_getchar,
                       _FDEV_SETUP_RW);
     stdin = stdout = stderr = &lcd_stream;
+}
+
+// position cursor anywhere on the LCD
+void ctrl_stdio_set_cursor(uint8_t col, uint8_t row)
+{
+    if (col >= LCD_COLS) col = LCD_COLS - 1;
+    if (row >= LCD_ROWS) row = LCD_ROWS - 1;
+    lcd_col = col;
+    lcd_row = row;
+    lcd.setCursor(col, row);
 }
