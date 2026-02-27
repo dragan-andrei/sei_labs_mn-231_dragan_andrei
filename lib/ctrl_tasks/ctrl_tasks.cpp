@@ -19,9 +19,10 @@ void ctrl_button_led_task_init(dd_button_t *button, dd_led_t *led)
                     );
     dd_led_init(led,
                     LED_GREEN_PIN,
-                    digitalWrite
+                    DD_LED_OUTPUT,
+                    digitalWrite,
+                    pinMode
                     );
-    pinMode(LED_GREEN_PIN, OUTPUT);
 }
 
 void ctrl_button_led_task(void *params)
@@ -62,9 +63,10 @@ void ctrl_blink_led_task_init(dd_led_t *led)
 {
     dd_led_init(led,
                     LED_RED_PIN,
-                    digitalWrite
+                    DD_LED_OUTPUT,
+                    digitalWrite,
+                    pinMode
                     );
-    pinMode(LED_RED_PIN, OUTPUT);
 }
 
 void ctrl_blink_led_task(void *params)
