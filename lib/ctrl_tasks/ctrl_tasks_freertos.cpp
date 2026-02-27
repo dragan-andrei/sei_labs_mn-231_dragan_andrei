@@ -5,17 +5,16 @@ QueueHandle_t xSendDataQueue;
 
 void ctrl_button_led_task_init(dd_button_t *button, dd_led_t *led)
 {
+   dd_button_init(button,
+                    BUTTON_PIN,
+                    INPUT_PULLUP,
+                    digitalRead,
+                    pinMode
+                    );
     dd_led_init(led,
                     LED_GREEN_PIN,
                     DD_LED_OUTPUT,
                     digitalWrite,
-                    pinMode
-                    );
-
-    dd_button_init(button,
-                    BUTTON_PIN,
-                    INPUT_PULLUP,
-                    digitalRead,
                     pinMode
                     );
     xButtonLedSemaphore = xSemaphoreCreateBinary();                
