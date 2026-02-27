@@ -7,8 +7,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define DD_LED_OUTPUT 0x01
-
 typedef enum 
 {
   DD_LED_OFF = 0,
