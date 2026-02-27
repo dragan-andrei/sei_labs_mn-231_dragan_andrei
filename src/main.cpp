@@ -1,10 +1,12 @@
 #include <Arduino.h>
 #include "srv_scheduler.h"
 
-void setup() {
+void setup() 
+{
   srv_scheduler_init();
 }
 
-void loop() {
-  ctrl_idle_task(NULL);
+void loop() 
+{
+  srv_scheduler_run();
 }

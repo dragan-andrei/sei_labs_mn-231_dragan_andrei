@@ -1,6 +1,9 @@
 #include "dd_led.h"
 
-void dd_led_init(dd_led_t* led, uint8_t pin_number, void (*set_state_fn)(uint8_t, uint8_t))
+void dd_led_init(dd_led_t* led, 
+                 uint8_t pin_number, 
+                 void (*set_state_fn)(uint8_t, uint8_t)
+                )
 {
     led->pin_number = pin_number;
     led->state = DD_LED_OFF;
