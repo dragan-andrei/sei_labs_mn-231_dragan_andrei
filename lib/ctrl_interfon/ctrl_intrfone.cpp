@@ -4,11 +4,8 @@ static dd_led_t green_led;
 static dd_led_t red_led;
 
 void ctrl_interfone_init(void) {
-    pinMode(LED_GREEN_PIN, OUTPUT);
-    pinMode(LED_RED_PIN, OUTPUT);
-
-    dd_led_init(&green_led, LED_GREEN_PIN, digitalWrite);
-    dd_led_init(&red_led, LED_RED_PIN, digitalWrite);
+    dd_led_init(&green_led, LED_GREEN_PIN, DD_LED_OUTPUT, digitalWrite, pinMode);
+    dd_led_init(&red_led, LED_RED_PIN, DD_LED_OUTPUT, digitalWrite, pinMode);
 
     ctrl_stdio_lcd_keypad_init();
 }   

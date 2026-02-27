@@ -17,8 +17,7 @@ static void (*led_set_state_function[LED_CMD_COUNT])(dd_led_t*) = {
 
 void ctrl_led_init(void)
 {
-    pinMode(LED_PIN_NUMBER, OUTPUT);
-    dd_led_init(&led, LED_PIN_NUMBER, digitalWrite);
+  dd_led_init(&led, LED_PIN_NUMBER, DD_LED_OUTPUT, digitalWrite, pinMode);
 }
 
 void ctrl_led_update(const char* input)

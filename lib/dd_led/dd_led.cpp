@@ -1,10 +1,21 @@
 #include "dd_led.h"
 
-void dd_led_init(dd_led_t* led, uint8_t pin_number, void (*set_state_fn)(uint8_t, uint8_t))
+void dd_led_init(dd_led_t* led,
+                 uint8_t pin_number,
+                 uint8_t mode,
+                 void (*set_state)(uint8_t, uint8_t),
+                 void (*set_pin_mode)(uint8_t, uint8_t))
 {
+    if (led == NULL || set_state == NULL || set_pin_mode == NULL) {
+        return;
+    }
+
     led->pin_number = pin_number;
     led->state = dd_led_off;
-    led->set_state = set_state_fn;
+    led->set_state = set_state;
+    led->set_pin_mode = set_pin_mode;
+
+    led->set_pin_mode(led->pin_number, mode);
     led->set_state(led->pin_number, LOW);
 }
 
