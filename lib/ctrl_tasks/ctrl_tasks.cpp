@@ -4,24 +4,20 @@ static volatile uint8_t green_led_state = DD_LED_OFF;
 static volatile uint16_t red_led_frequency = DEFAULT_BLINK_FREQUENCY;
 static volatile uint8_t red_led_state = DD_LED_OFF;
 
-static uint8_t digital_read_wrapper(uint8_t pin)
-{
-    return (uint8_t)digitalRead(pin);
-}
-
 void ctrl_button_led_task_init(dd_button_t *button, dd_led_t *led)
 {
     dd_button_init(button,
                     BUTTON_PIN,
                     INPUT_PULLUP,
-                    digital_read_wrapper,
+                    digitalRead,
                     pinMode
                     );
     dd_led_init(led,
                     LED_GREEN_PIN,
-                    digitalWrite
+                    DD_LED_OUTPUT,
+                    digitalWrite,
+                    pinMode
                     );
-    pinMode(LED_GREEN_PIN, OUTPUT);
 }
 
 void ctrl_button_led_task(void *params)
@@ -62,9 +58,10 @@ void ctrl_blink_led_task_init(dd_led_t *led)
 {
     dd_led_init(led,
                     LED_RED_PIN,
-                    digitalWrite
+                    DD_LED_OUTPUT,
+                    digitalWrite,
+                    pinMode
                     );
-    pinMode(LED_RED_PIN, OUTPUT);
 }
 
 void ctrl_blink_led_task(void *params)
@@ -101,13 +98,13 @@ void ctrl_inc_dec_led_task_init(dd_button_t *button_up, dd_button_t *button_down
     dd_button_init(button_up,
                     BUTTON_UP_PIN,
                     INPUT_PULLUP,
-                    digital_read_wrapper,
+                    digitalRead,
                     pinMode
                     );
     dd_button_init(button_down,
                     BUTTON_DOWN_PIN,
                     INPUT_PULLUP,
-                    digital_read_wrapper,
+                    digitalRead,
                     pinMode
                     );
 }

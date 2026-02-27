@@ -7,12 +7,14 @@ void ctrl_button_led_task_init(dd_button_t *button, dd_led_t *led)
 {
     dd_led_init(led,
                     LED_GREEN_PIN,
+                    DD_LED_OUTPUT,
                     digitalWrite,
                     pinMode
                     );
 
     dd_button_init(button,
                     BUTTON_PIN,
+                    INPUT_PULLUP,
                     digitalRead,
                     pinMode
                     );
@@ -43,7 +45,7 @@ void ctrl_button_led_task(void *params)
             if (dd_button_is_pressed(&button))
             {
                 xSemaphoreGive(xButtonLedSemaphore);
-                DD_LED_ON(&led);
+                dd_led_set_on(&led);
                 led_off_time = xTaskGetTickCount() + pdMS_TO_TICKS(FREERTOS_FIRST_ON_TIME_MS);
                 led_on_flag = true;
             }
@@ -52,7 +54,7 @@ void ctrl_button_led_task(void *params)
         
         if(led_on_flag && xTaskGetTickCount() >= led_off_time)
         {
-            DD_LED_OFF(&led);
+            dd_led_set_off(&led);
             led_on_flag = false;
         }
 

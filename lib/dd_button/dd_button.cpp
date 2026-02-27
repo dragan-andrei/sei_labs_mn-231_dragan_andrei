@@ -3,7 +3,7 @@
 void dd_button_init(dd_button_t* button, 
                     uint8_t pin, 
                     uint8_t mode,
-                    uint8_t(*read_state)(uint8_t),
+                    int(*read_state)(uint8_t),
                     void(*set_pin_mode)(uint8_t, uint8_t)
                     )
 {
@@ -25,7 +25,8 @@ bool dd_button_is_pressed(dd_button_t* button)
         return 0;
     }
 
-    button->state = button->read_state(button->pin) == 0 ? 0 : 1;
+    int raw_state = button->read_state(button->pin);
+    button->state = (uint8_t)(raw_state == 0 ? 0 : 1);
 
     return (button->state == 0);
 }

@@ -23,7 +23,8 @@ typedef struct
 
 void dd_led_init(dd_led_t* led, 
                 uint8_t pin_number, 
-                void (*set_state_fn)(uint8_t, uint8_t), 
+                uint8_t mode,
+                void (*set_state)(uint8_t, uint8_t), 
                 void(*set_pin_mode)(uint8_t, uint8_t)
               );
 void dd_led_set_on(dd_led_t* led);
