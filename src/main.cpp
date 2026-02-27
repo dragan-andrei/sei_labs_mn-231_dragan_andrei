@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "ctrl_interfone.h"
+#include "srv_scheduler.h"
 
 
 
@@ -9,9 +9,9 @@
 
 
 void setup() {
-  ctrl_interfone_init();
+  srv_scheduler_init();
 }
 
 void loop() {
- ctrl_interfone_update();
+  ctrl_idle_task(NULL);
 }

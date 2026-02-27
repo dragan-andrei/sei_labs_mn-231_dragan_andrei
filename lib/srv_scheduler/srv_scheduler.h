@@ -5,7 +5,8 @@
 #include "configs.h"
 #include "timer-api.h"
 
-void srv_scheduler_init();
+void srv_scheduler_init(void);
+void srv_scheduler_run(void);
 
 
 

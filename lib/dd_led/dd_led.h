@@ -4,14 +4,19 @@
 #define DD_LED_OUTPUT 0x01    
 
 #include <Arduino.h>
+#include <stdint.h>
 #include <stdlib.h>
 
-typedef enum {
+#define DD_LED_OUTPUT 0x01
+
+typedef enum 
+{
   DD_LED_OFF = 0,
   DD_LED_ON = 1,
 } dd_led_state_t;
 
-typedef struct {
+typedef struct 
+{
   uint8_t pin_number;
   dd_led_state_t state;
   void (*set_state)(uint8_t, uint8_t);
