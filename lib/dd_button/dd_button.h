@@ -13,14 +13,14 @@
 typedef struct {
     uint8_t pin;
     uint8_t state;
-    uint8_t(*read_state)(uint8_t pin);
+    int(*read_state)(uint8_t pin);
     void(*set_pin_mode)(uint8_t pin, uint8_t mode);
 
 } dd_button_t;
 
 void dd_button_init(
                     dd_button_t* button, uint8_t pin, uint8_t mode,
-                    uint8_t(*read_state)(uint8_t), 
+                    int(*read_state)(uint8_t), 
                     void(*set_pin_mode)(uint8_t, uint8_t)
                     );
 
