@@ -67,7 +67,7 @@
     [ "r2:2", "mega:15", "green", [ "h-19.2", "v267.6" ] ],
     [ "led2:C", "led1:C", "black", [ "v0" ] ],
     [ "led1:C", "mega:GND.1", "black", [ "v0" ] ],
-    [ "btn1:1.r", "mega:GND.5", "green", [ "v0", "h29", "v297.6", "h-422.4" ] ],
+    [ "btn1:2.r", "mega:GND.5", "green", [ "v0", "h29", "v297.6", "h-422.4" ] ],
     [ "btn2:2.r", "mega:GND.5", "green", [ "h29", "v221", "h-422.4" ] ],
     [ "btn3:2.r", "mega:GND.5", "green", [ "h29", "v153.8", "h-432" ] ]
   ],

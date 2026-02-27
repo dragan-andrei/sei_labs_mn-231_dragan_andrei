@@ -15,7 +15,7 @@ void srv_scheduler_run(void)
     static uint32_t second_task_time = RED_LED_TASK_OFFSET_MS;
     static uint32_t third_task_time = INC_DEC_LED_TASK_OFFSET_MS;
 
-    if (!(----first_task_time)) 
+    if (!(--first_task_time))
     {
         ctrl_button_led_task(NULL);
         first_task_time += BUTTON_LED_TASK_RECURRANCE_MS; // Schedule next run
@@ -37,6 +37,6 @@ void srv_scheduler_run(void)
     
 }
 
-void timer_handle_interrupts(void){
+void timer_handle_interrupts(int timer){
    srv_scheduler_run();
 }
