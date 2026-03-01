@@ -4,8 +4,8 @@
 #define BAUDRATE 115200
 
 // Define constants for the system
-#define LED_RED_PIN 14
-#define LED_GREEN_PIN 15
+#define LED_RED_PIN 6     // led2 (blue) -> r2 -> mega:6
+#define LED_GREEN_PIN 7   // led1 (green) -> r1 -> mega:7
 #define LCD_COLS 16
 #define LCD_ROWS 2
 #define LCD_ADDR 0x27
@@ -18,9 +18,9 @@
 
 #define WAIT_TIME_MS 3000
 
-#define BUTTON_PIN 11   // btn1 -> mega:11 (green)
-#define BUTTON_UP_PIN 10   // btn2 -> mega:10 (green)
-#define BUTTON_DOWN_PIN 9    // btn3 -> mega:9  (green)
+#define BUTTON_PIN 4    // btn1 -> mega:4 (yellow)
+#define BUTTON_UP_PIN 3    // btn2 -> mega:3 (red)
+#define BUTTON_DOWN_PIN 5  // btn3 -> mega:5 (grey)
 #define BUTTON_DEBOUNCE_DELAY 100 // ms
 
 #define DEFAULT_BLINK_FREQUENCY 500 // ms
@@ -42,7 +42,17 @@
 #define FREERTOS_FIRST_TASK_STACK_SIZE     128
 #define FREERTOS_FIRST_TASK_PRIORITY        1
 
+#define FREERTOS_SECOND_TASK_STACK_SIZE    192
+#define FREERTOS_SECOND_TASK_PRIORITY      1
+#define FREERTOS_SECOND_SEND_INTERVAL_MS   50
+#define FREERTOS_SECOND_LED_ON_MS          300
+#define FREERTOS_SECOND_LED_OFF_MS         500
 
+#define FREERTOS_THIRD_TASK_STACK_SIZE     256
+#define FREERTOS_THIRD_TASK_PRIORITY       1
+#define FREERTOS_THIRD_RECURRANCE_MS       200
+
+#define FREERTOS_QUEUE_SIZE                64
 
 typedef enum {
     KEYPAD_PIN_1=23,

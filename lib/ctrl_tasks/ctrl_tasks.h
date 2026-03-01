@@ -28,6 +28,12 @@ void ctrl_inc_dec_led_task(void *params);
 // void ctrl_idle_task_init(void);
 void ctrl_idle_task(void *params);
 
-void ctrl_button_led_task_freertos(void *params);
+/* FreeRTOS tasks */
+extern SemaphoreHandle_t xButtonLedSemaphore;
+extern QueueHandle_t xSendDataQueue;
 
-#endif // CTRL_TASKS_H  
+void ctrl_button_led_task_freertos(void *params);
+void ctrl_sync_task_freertos(void *params);
+void ctrl_async_task_freertos(void *params);
+
+#endif // CTRL_TASKS_H
