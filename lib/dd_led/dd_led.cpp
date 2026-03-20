@@ -11,13 +11,13 @@ void dd_led_init(dd_led_t* led, uint8_t pin_number, void (*set_state_fn)(uint8_t
 void dd_led_set_on(dd_led_t* led)
 {
     led->set_state(led->pin_number, HIGH);
-    led->state = dd_led_on;
+    led->state = dd_led_on; // это для логики тогла
 }
 
 void dd_led_set_off(dd_led_t* led)
 {
     led->set_state(led->pin_number, LOW);
-    led->state = dd_led_off;
+    led->state = dd_led_off; // это для логики тогла
 }
 
 void dd_led_toggle(dd_led_t* led)
