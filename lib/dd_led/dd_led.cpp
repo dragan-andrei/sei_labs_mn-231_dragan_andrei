@@ -21,18 +21,30 @@ void dd_led_init(dd_led_t* led,
 
 void dd_led_set_on(dd_led_t* led)
 {
+    if (led == NULL || led->set_state == NULL) {
+        return;
+    }
+
     led->set_state(led->pin_number, HIGH);
     led->state = DD_LED_ON;
 }
 
 void dd_led_set_off(dd_led_t* led)
 {
+    if (led == NULL || led->set_state == NULL) {
+        return;
+    }
+
     led->set_state(led->pin_number, LOW);
     led->state = DD_LED_OFF;
 }
 
 void dd_led_toggle(dd_led_t* led)
 {
+    if (led == NULL) {
+        return;
+    }
+
     if (led->state == DD_LED_ON) {
         dd_led_set_off(led);
     } else {

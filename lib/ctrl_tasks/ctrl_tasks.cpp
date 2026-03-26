@@ -1,8 +1,8 @@
 #include "ctrl_tasks.h"
 
 static volatile uint8_t green_led_state = DD_LED_OFF;
-static volatile uint16_t red_led_frequency = DEFAULT_BLINK_FREQUENCY;
-static volatile uint8_t red_led_state = DD_LED_OFF;
+static volatile uint16_t blue_led_frequency = DEFAULT_BLINK_FREQUENCY;
+static volatile uint8_t blue_led_state = DD_LED_OFF;
 
 void ctrl_button_led_task_init(dd_button_t *button, dd_led_t *led)
 {
@@ -57,7 +57,7 @@ void ctrl_button_led_task(void *params)
 void ctrl_blink_led_task_init(dd_led_t *led)
 {
     dd_led_init(led,
-                    LED_RED_PIN,
+                    LED_BLUE_PIN,
                     DD_LED_OUTPUT,
                     digitalWrite,
                     pinMode
@@ -81,14 +81,14 @@ void ctrl_blink_led_task(void *params)
         if (millis() >= next_toggle_time)
         {
             dd_led_toggle(&led);
-            red_led_state = led.state;
-            next_toggle_time = millis() + red_led_frequency;
+            blue_led_state = led.state;
+            next_toggle_time = millis() + blue_led_frequency;
         }
     }
     else
     {
         dd_led_set_off(&led);
-        red_led_state = DD_LED_OFF;
+        blue_led_state = DD_LED_OFF;
         next_toggle_time = 0;
     }
 }
@@ -129,9 +129,9 @@ void ctrl_inc_dec_led_task(void *params)
         {
             next_check_time_up = millis() + BUTTON_DEBOUNCE_DELAY;
 
-            if (red_led_frequency > MIN_BLINK_FREQUENCY)
+            if (blue_led_frequency > MIN_BLINK_FREQUENCY)
             {
-                red_led_frequency -= BLINK_FREQUENCY_STEP;
+                blue_led_frequency -= BLINK_FREQUENCY_STEP;
             }
         }
     }
@@ -142,9 +142,9 @@ void ctrl_inc_dec_led_task(void *params)
         {
             next_check_time_down = millis() + BUTTON_DEBOUNCE_DELAY;
 
-            if (red_led_frequency < MAX_BLINK_FREQUENCY)
+            if (blue_led_frequency < MAX_BLINK_FREQUENCY)
             {
-                red_led_frequency += BLINK_FREQUENCY_STEP;
+                blue_led_frequency += BLINK_FREQUENCY_STEP;
             }
         }
     }
@@ -168,10 +168,10 @@ void ctrl_idle_task(void *params)
 
     if (millis() >= next_print_time)
     {
-        printf("Green LED: %s | Red LED: %s | Blink freq: %u ms\n",
+         printf("Green LED: %s | Blue LED: %s | Blink freq: %u ms\n",
                green_led_state ? "ON" : "OFF",
-               red_led_state ? "ON" : "OFF",
-               red_led_frequency);
-        next_print_time = millis() + 500;
+             blue_led_state ? "ON" : "OFF",
+             blue_led_frequency);
+        next_print_time = millis() + TASKS_IDLE_STATUS_PRINT_MS;
     }
 }

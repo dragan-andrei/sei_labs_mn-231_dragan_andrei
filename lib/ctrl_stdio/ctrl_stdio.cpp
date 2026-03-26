@@ -3,6 +3,7 @@
 // Two separate streams: one for Serial, one for LCD+Keypad
 static FILE serial_stream = {0};
 static FILE lcd_stream    = {0};
+static bool serial_stdio_initialized = false;
 
 char keys[KEYPAD_ROWS][KEYPAD_COLS] = {
     {'1', '2', '3', 'A'},
@@ -81,12 +82,20 @@ int ctrl_stdio_getchar(FILE* f)
 // Redirect stdin/stdout/stderr to Serial UART
 void ctrl_stdio_serial_init()
 {
+    if (serial_stdio_initialized) {
+        return;
+    }
+
     Serial.begin(BAUDRATE);
+    while (!Serial && millis() < 500) {
+    }
+
     fdev_setup_stream(&serial_stream,
                       ctrl_stdio_putchar,
                       ctrl_stdio_getchar,
                       _FDEV_SETUP_RW);
     stdin = stdout = stderr = &serial_stream;
+    serial_stdio_initialized = true;
 }
 
 // Redirect stdin/stdout/stderr to LCD + Keypad

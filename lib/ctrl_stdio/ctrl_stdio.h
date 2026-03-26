@@ -4,8 +4,6 @@
 #include <Arduino.h>
 #include <stdio.h>
 
-#define BAUDRATE 115200
-
 #include <LiquidCrystal_I2C.h>
 #include <Keypad.h>
 
