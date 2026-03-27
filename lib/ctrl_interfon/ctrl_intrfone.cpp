@@ -15,7 +15,7 @@ void ctrl_interfone_update(void) {
 
    printf("\fEnter password: \n");
    //TODO: Enhance input handling to support backspace and other editing features
-    scanf("%4s", input_data);
+    scanf(USER_PASSWORD_INPUT_FORMAT, input_data);
 
     if (strcmp(input_data, USER_PASSWORD) == 0) {
         printf("Access granted!     \n");

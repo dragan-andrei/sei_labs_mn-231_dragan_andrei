@@ -1,42 +1,34 @@
 #include "srv_scheduler.h"
 
+#include <Arduino_FreeRTOS.h>
+
+#include "ctrl_stdio.h"
+
 
 void srv_scheduler_init(void)
 {
+    ctrl_stdio_serial_init();
+    ctrl_stdio_lcd_init();
+    ctrl_sensor_task_init();
 
-    timer_init_ISR_1KHz(TIMER_DEFAULT);
+    xTaskCreate(ctrl_sensor_acquisition_task,
+                "sensor_acq",
+                SENSOR_ACQUISITION_TASK_STACK_SIZE,
+                NULL,
+                SENSOR_ACQUISITION_TASK_PRIORITY,
+                NULL);
+
+    xTaskCreate(ctrl_sensor_report_task,
+                "sensor_rep",
+                SENSOR_REPORT_TASK_STACK_SIZE,
+                NULL,
+                SENSOR_REPORT_TASK_PRIORITY,
+                NULL);
 
 }
 
 
 void srv_scheduler_run(void)
 {
-    static uint32_t first_task_time = BUTTON_LED_TASK_OFFSET_MS;
-    static uint32_t second_task_time = RED_LED_TASK_OFFSET_MS;
-    static uint32_t third_task_time = INC_DEC_LED_TASK_OFFSET_MS;
 
-    if (!(--first_task_time))
-    {
-        ctrl_button_led_task(NULL);
-        first_task_time += BUTTON_LED_TASK_RECURRANCE_MS; // Schedule next run
-    }
-
-    if(!(--second_task_time)) 
-    {
-        ctrl_blink_led_task(NULL);
-        second_task_time += RED_LED_TASK_RECURRANCE_MS; // Schedule next run
-    }
-
-    if(!(--third_task_time)) 
-    {
-        ctrl_inc_dec_led_task(NULL);
-        third_task_time += INC_DEC_LED_TASK_RECURRANCE_MS; // Schedule next run
-    }
-
-    
-    
-}
-
-void timer_handle_interrupts(int timer){
-   srv_scheduler_run();
 }

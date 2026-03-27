@@ -4,7 +4,7 @@
 #include <ctrl_stdio.h>
 #include <dd_led.h>
 
-#define LED_PIN_NUMBER 12
+#define LED_PIN_NUMBER CTRL_LED_PIN
 #define LED_CMD_COUNT 3
 
 typedef enum {

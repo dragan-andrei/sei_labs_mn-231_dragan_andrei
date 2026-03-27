@@ -177,6 +177,6 @@ void ctrl_idle_task(void *params)
                green_led_state ? "ON" : "OFF",
                red_led_state ? "ON" : "OFF",
                red_led_frequency);
-        next_print_time = millis() + 500;
+        next_print_time = millis() + IDLE_TASK_PRINT_INTERVAL_MS;
     }
 }
