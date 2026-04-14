@@ -4,6 +4,9 @@
 #include <Arduino.h>
 #include <stdbool.h>
 
+#include "filtru_medie_ponderata.h"
+#include "filtru_sare_si_piper.h"
+
 typedef enum
 {
 	DD_TEMP_SENSOR_OK = 0,
@@ -15,10 +18,16 @@ typedef struct
 {
 	uint8_t pin;
 	float temperature_c;
+	float last_voltage_v;
+	float raw_temperature_c;
+	float salt_pepper_temperature_c;
+	uint16_t raw_adc_value;
+	uint16_t salt_pepper_adc_value;
+	uint16_t last_adc_value;
 	uint8_t is_initialized;
 	dd_temp_sensor_status_t status;
-	void *one_wire_handle;
-	void *dallas_handle;
+	filtru_sare_si_piper_t salt_pepper_filter;
+	filtru_medie_ponderata_t weighted_filter;
 } dd_temp_sensor_t;
 
 void dd_temp_sensor_init(dd_temp_sensor_t *sensor, uint8_t pin);
