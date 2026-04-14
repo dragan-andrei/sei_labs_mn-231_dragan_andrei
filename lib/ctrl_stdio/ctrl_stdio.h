@@ -13,6 +13,8 @@ void ctrl_stdio_serial_init(void);
 void ctrl_stdio_lcd_init(void);
 void ctrl_stdio_lcd_print_two_lines(const char *first_line, const char *second_line);
 void ctrl_stdio_lcd_keypad_init(void);
+bool ctrl_stdio_keypad_read_char(char *key);
+bool ctrl_stdio_serial_read_char(char *character);
 
 
 #endif

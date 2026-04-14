@@ -73,11 +73,25 @@ int ctrl_stdio_lcd_putchar(char ch, FILE* f)
 int ctrl_stdio_keypad_getchar(FILE* f)
 {
     (void)f;
-    char key = kpd.getKey();
-    while (key == NO_KEY) {
-        key = kpd.getKey();
+    char key = NO_KEY;
+
+    while (ctrl_stdio_keypad_read_char(&key) == false) {
     }
+
     return key;
+}
+
+bool ctrl_stdio_keypad_read_char(char *key)
+{
+    const char current_key = kpd.getKey();
+
+    if (key == NULL || current_key == NO_KEY)
+    {
+        return false;
+    }
+
+    *key = current_key;
+    return true;
 }
 
 
@@ -95,8 +109,24 @@ int ctrl_stdio_putchar(char ch, FILE* f)
 int ctrl_stdio_getchar(FILE* f)
 {
     (void)f;
-    while (Serial.available() == 0);
-    return Serial.read();
+    char character = '\0';
+
+    while (ctrl_stdio_serial_read_char(&character) == false)
+    {
+    }
+
+    return character;
+}
+
+bool ctrl_stdio_serial_read_char(char *character)
+{
+    if (character == NULL || Serial.available() == 0)
+    {
+        return false;
+    }
+
+    *character = (char)Serial.read();
+    return true;
 }
 
 // -- Public init functions ----------------------------------------------------

@@ -9,20 +9,13 @@ void srv_scheduler_init(void)
 {
     ctrl_stdio_serial_init();
     ctrl_stdio_lcd_init();
-    ctrl_sensor_task_init();
+    ctrl_relay_task_init();
 
-    xTaskCreate(ctrl_sensor_acquisition_task,
-                "sensor_acq",
-                SENSOR_ACQUISITION_TASK_STACK_SIZE,
+    xTaskCreate(ctrl_relay_command_task,
+                "relay_cmd",
+                RELAY_COMMAND_TASK_STACK_SIZE,
                 NULL,
-                SENSOR_ACQUISITION_TASK_PRIORITY,
-                NULL);
-
-    xTaskCreate(ctrl_sensor_report_task,
-                "sensor_rep",
-                SENSOR_REPORT_TASK_STACK_SIZE,
-                NULL,
-                SENSOR_REPORT_TASK_PRIORITY,
+                RELAY_COMMAND_TASK_PRIORITY,
                 NULL);
 
 }
