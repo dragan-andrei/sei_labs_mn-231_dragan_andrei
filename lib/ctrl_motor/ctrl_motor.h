@@ -24,6 +24,7 @@ typedef struct
 void ctrl_motor_init(void);
 void ctrl_motor_handle_serial_char(char character);
 void ctrl_motor_handle_keypad_char(char key);
+void ctrl_motor_flush_serial_if_idle(void);
 void ctrl_motor_control_step(void);
 void ctrl_motor_report_status_if_due(void);
 void ctrl_motor_get_status(ctrl_motor_status_t *status);

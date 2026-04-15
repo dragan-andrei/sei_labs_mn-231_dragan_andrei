@@ -13,6 +13,9 @@ static volatile int8_t g_applied_power_percent = MOTOR_POWER_DEFAULT_PERCENT;
 static volatile uint8_t g_motor_initialized = 0U;
 static volatile uint8_t g_status_changed = 1U;
 static volatile uint8_t g_limit_event = (uint8_t)CTRL_MOTOR_LIMIT_NONE;
+static volatile char g_last_serial_line_ending = '\0';
+static volatile uint32_t g_last_serial_activity_time_ms = 0U;
+static volatile uint8_t g_serial_command_overflow = 0U;
 
 static char g_serial_command_buffer[MOTOR_SERIAL_INPUT_BUFFER_SIZE];
 static uint8_t g_serial_command_length = 0U;
@@ -230,7 +233,9 @@ static void ctrl_motor_execute_serial_command(const char *raw_line)
     }
 
     printf("[MOTOR][SERIAL] unknown command: %s\n", command_line);
+#if (MOTOR_SERIAL_HELP_ON_UNKNOWN_ENABLED == 1)
     ctrl_motor_print_command_help();
+#endif
 }
 
 void ctrl_motor_init(void)
@@ -256,6 +261,9 @@ void ctrl_motor_init(void)
     g_limit_event = (uint8_t)CTRL_MOTOR_LIMIT_NONE;
     g_serial_command_length = 0U;
     g_serial_command_buffer[0] = '\0';
+    g_last_serial_line_ending = '\0';
+    g_last_serial_activity_time_ms = millis();
+    g_serial_command_overflow = 0U;
     g_motor_initialized = 1U;
 
     printf("[MOTOR] initialized\n");
@@ -278,6 +286,25 @@ void ctrl_motor_handle_serial_char(char character)
 
     if (character == '\r' || character == '\n')
     {
+        if ((g_last_serial_line_ending == '\r' && character == '\n') ||
+            (g_last_serial_line_ending == '\n' && character == '\r'))
+        {
+            g_last_serial_line_ending = character;
+            return;
+        }
+
+        g_last_serial_line_ending = character;
+
+        if (g_serial_command_overflow != 0U)
+        {
+            printf("\n[MOTOR][SERIAL] input too long\n");
+            g_serial_command_overflow = 0U;
+            g_serial_command_length = 0U;
+            g_serial_command_buffer[0] = '\0';
+            ctrl_motor_print_serial_prompt();
+            return;
+        }
+
         if (g_serial_command_length > 0U)
         {
             printf("\n");
@@ -292,13 +319,24 @@ void ctrl_motor_handle_serial_char(char character)
         return;
     }
 
+    g_last_serial_line_ending = '\0';
+
     if (character == '\b' || character == 127)
     {
+        g_last_serial_activity_time_ms = millis();
+
+        if (g_serial_command_overflow != 0U)
+        {
+            return;
+        }
+
         if (g_serial_command_length > 0U)
         {
             g_serial_command_length--;
             g_serial_command_buffer[g_serial_command_length] = '\0';
+#if (MOTOR_SERIAL_ECHO_ENABLED == 1)
             printf("\b \b");
+#endif
         }
 
         return;
@@ -309,13 +347,54 @@ void ctrl_motor_handle_serial_char(char character)
         return;
     }
 
+    if (g_serial_command_overflow != 0U)
+    {
+        g_last_serial_activity_time_ms = millis();
+        return;
+    }
+
     if (g_serial_command_length < (uint8_t)(sizeof(g_serial_command_buffer) - 1U))
     {
+        g_last_serial_activity_time_ms = millis();
         g_serial_command_buffer[g_serial_command_length] = character;
         g_serial_command_length++;
         g_serial_command_buffer[g_serial_command_length] = '\0';
+#if (MOTOR_SERIAL_ECHO_ENABLED == 1)
         printf("%c", character);
+#endif
     }
+    else
+    {
+        g_serial_command_overflow = 1U;
+    }
+}
+
+void ctrl_motor_flush_serial_if_idle(void)
+{
+#if (MOTOR_SERIAL_IDLE_EXECUTE_ENABLED == 1)
+    const uint32_t now = millis();
+
+    if (g_motor_initialized == 0U || g_serial_command_length == 0U)
+    {
+        return;
+    }
+
+    if ((uint32_t)(now - g_last_serial_activity_time_ms) < MOTOR_SERIAL_IDLE_EXECUTE_MS)
+    {
+        return;
+    }
+
+    printf("\n");
+    g_serial_command_buffer[g_serial_command_length] = '\0';
+    ctrl_motor_execute_serial_command(g_serial_command_buffer);
+    g_serial_command_length = 0U;
+    g_serial_command_buffer[0] = '\0';
+    g_serial_command_overflow = 0U;
+    g_last_serial_line_ending = '\n';
+    ctrl_motor_print_serial_prompt();
+#else
+    return;
+#endif
 }
 
 void ctrl_motor_handle_keypad_char(char key)
@@ -327,8 +406,10 @@ void ctrl_motor_handle_keypad_char(char key)
         return;
     }
 
+#if (MOTOR_KEYPAD_VERBOSE_ENABLED == 1)
     printf("\n[MOTOR][KEYPAD] key=%c\n", normalized_key);
     ctrl_motor_print_serial_prompt();
+#endif
 
     if (normalized_key == MOTOR_KEYPAD_COMMAND_MAX)
     {
@@ -355,6 +436,7 @@ void ctrl_motor_handle_keypad_char(char key)
 void ctrl_motor_control_step(void)
 {
     const int8_t target_power = g_target_power_percent;
+    dd_motor_state_t applied_state;
 
     if (g_motor_initialized == 0U)
     {
@@ -369,6 +451,14 @@ void ctrl_motor_control_step(void)
     dd_motor_set_power_percent(&g_motor, target_power);
     g_applied_power_percent = target_power;
     g_status_changed = 1U;
+
+#if (MOTOR_CONTROL_APPLY_LOG_ENABLED == 1)
+    applied_state = dd_motor_get_state(&g_motor);
+    printf("[MOTOR][APPLY] dir=%s power=%d%% pwm=%u\n",
+           ctrl_motor_direction_to_text(applied_state.direction),
+           (int)applied_state.power_percent,
+           applied_state.pwm_value);
+#endif
 }
 
 void ctrl_motor_get_status(ctrl_motor_status_t *status)
@@ -419,7 +509,9 @@ void ctrl_motor_report_status_if_due(void)
              status_snapshot.motor_state.pwm_value,
              (int)status_snapshot.target_power_percent);
 
+#if (LCD_STATUS_OUTPUT_ENABLED == 1)
     ctrl_stdio_lcd_print_two_lines(first_line, second_line);
+#endif
 
     printf("[MOTOR] dir=%s target=%d%% applied=%d%% pwm=%u\n",
            ctrl_motor_direction_to_text(status_snapshot.motor_state.direction),

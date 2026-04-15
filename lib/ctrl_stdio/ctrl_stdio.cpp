@@ -76,6 +76,9 @@ int ctrl_stdio_keypad_getchar(FILE* f)
     char key = NO_KEY;
 
     while (ctrl_stdio_keypad_read_char(&key) == false) {
+#if (CTRL_STDIO_COOPERATIVE_GETCHAR_ENABLED == 1)
+        delay(1);
+#endif
     }
 
     return key;
@@ -113,6 +116,9 @@ int ctrl_stdio_getchar(FILE* f)
 
     while (ctrl_stdio_serial_read_char(&character) == false)
     {
+#if (CTRL_STDIO_COOPERATIVE_GETCHAR_ENABLED == 1)
+        delay(1);
+#endif
     }
 
     return character;
