@@ -4,9 +4,9 @@
 #define BAUDRATE 115200
 
 // Define constants for the system
-#define LED_RED_PIN 14
-#define LED_GREEN_PIN 15
-#define CTRL_LED_PIN 12
+// #define LED_RED_PIN 14
+// #define LED_GREEN_PIN 15
+// #define CTRL_LED_PIN 12
 #define LCD_COLS 16
 #define LCD_ROWS 2
 #define LCD_ADDR 0x27
@@ -23,17 +23,65 @@
 #define KEYPAD_ROWS 4
 #define KEYPAD_COLS 4
 
+#define MOTOR_L298_ENA_PWM_PIN 9
+#define MOTOR_L298_IN1_PIN 8
+#define MOTOR_L298_IN2_PIN 10
+
+#define MOTOR_POWER_MIN_PERCENT (-100)
+#define MOTOR_POWER_MAX_PERCENT 100
+#define MOTOR_POWER_STEP_PERCENT 10
+#define MOTOR_POWER_DEFAULT_PERCENT 0
+
+#define MOTOR_PWM_MIN 0
+#define MOTOR_PWM_MAX 255
+
+#define MOTOR_SERIAL_INPUT_BUFFER_SIZE 48
+
+#define MOTOR_SERIAL_COMMAND_SET "motor set"
+#define MOTOR_SERIAL_COMMAND_STOP "motor stop"
+#define MOTOR_SERIAL_COMMAND_MAX "motor max"
+#define MOTOR_SERIAL_COMMAND_INC "motor inc"
+#define MOTOR_SERIAL_COMMAND_DEC "motor dec"
+
+#define MOTOR_KEYPAD_COMMAND_MAX 'A'
+#define MOTOR_KEYPAD_COMMAND_STOP 'B'
+#define MOTOR_KEYPAD_COMMAND_INC 'C'
+#define MOTOR_KEYPAD_COMMAND_DEC 'D'
+
+#define MOTOR_STATUS_TEXT_BUFFER_SIZE LCD_LINE_BUFFER_SIZE
+#define MOTOR_REPORT_PERIOD_MS 1000
+
+#define MOTOR_COMMAND_TASK_OFFSET_MS 20
+#define MOTOR_COMMAND_TASK_RECURRANCE_MS 50
+
+#define MOTOR_CONTROL_TASK_OFFSET_MS 5
+#define MOTOR_CONTROL_TASK_RECURRANCE_MS 20
+
+#define MOTOR_STATUS_TASK_OFFSET_MS 60
+#define MOTOR_STATUS_TASK_RECURRANCE_MS 100
+
+#define MOTOR_COMMAND_TASK_STACK_SIZE 256
+#define MOTOR_COMMAND_TASK_PRIORITY 2
+
+#define MOTOR_CONTROL_TASK_STACK_SIZE 256
+#define MOTOR_CONTROL_TASK_PRIORITY 3
+
+#define MOTOR_STATUS_TASK_STACK_SIZE 256
+#define MOTOR_STATUS_TASK_PRIORITY 1
+
+#define MOTOR_LIMIT_MESSAGE_ENABLED 1
+
 #define WAIT_TIME_MS 3000
 
-#define BUTTON_PIN 11   // btn1 -> mega:11 (green)
-#define BUTTON_UP_PIN 10   // btn2 -> mega:10 (green)
-#define BUTTON_DOWN_PIN 9    // btn3 -> mega:9  (green)
-#define BUTTON_DEBOUNCE_DELAY 100 // ms
+// #define BUTTON_PIN 11   // btn1 -> mega:11 (green)
+// #define BUTTON_UP_PIN 10   // btn2 -> mega:10 (green)
+// #define BUTTON_DOWN_PIN 9    // btn3 -> mega:9  (green)
+// #define BUTTON_DEBOUNCE_DELAY 100 // ms
 
-#define DEFAULT_BLINK_FREQUENCY 500 // ms
-#define MIN_BLINK_FREQUENCY 100 // ms
-#define MAX_BLINK_FREQUENCY 2000 // ms
-#define BLINK_FREQUENCY_STEP 100 // ms
+// #define DEFAULT_BLINK_FREQUENCY 500 // ms
+// #define MIN_BLINK_FREQUENCY 100 // ms
+// #define MAX_BLINK_FREQUENCY 2000 // ms
+// #define BLINK_FREQUENCY_STEP 100 // ms
 
 #define BUTTON_LED_TASK_OFFSET_MS       1
 #define BUTTON_LED_TASK_RECURRANCE_MS   50
@@ -55,14 +103,14 @@
 
 
 typedef enum {
-    KEYPAD_PIN_1=23,
-    KEYPAD_PIN_2=25,
-    KEYPAD_PIN_3=27,  
-    KEYPAD_PIN_4=29,
-    KEYPAD_PIN_5=31,
-    KEYPAD_PIN_6=33,
-    KEYPAD_PIN_7=35,
-    KEYPAD_PIN_8=37,     
+    KEYPAD_PIN_1=2,
+    KEYPAD_PIN_2=3,
+    KEYPAD_PIN_3=4,
+    KEYPAD_PIN_4=5,
+    KEYPAD_PIN_5=6,
+    KEYPAD_PIN_6=7,
+    KEYPAD_PIN_7=11,
+    KEYPAD_PIN_8=12,
 }keypad_pin_t;
 
 #endif // CONFIGS_H
