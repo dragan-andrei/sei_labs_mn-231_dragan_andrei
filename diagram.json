@@ -47,6 +47,20 @@
       "top": -101.65,
       "left": 115.2,
       "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_heater",
+      "top": -170,
+      "left": 370,
+      "attrs": { "color": "green" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_heater",
+      "top": -133,
+      "left": 370,
+      "attrs": { "value": "220" }
     }
   ],
   "connections": [
@@ -73,7 +87,11 @@
     [ "r_led:2", "mega:14", "red", [ "v105.6", "h64.1" ] ],
     [ "led_warn:C", "mega:GND.2", "black", [ "h-76.4", "v355.2", "h132.25" ] ],
     [ "buzzer1:1", "mega:7", "purple", [ "v57.6", "h-63.2" ] ],
-    [ "buzzer1:2", "mega:GND.2", "black", [ "v0" ] ]
+    [ "buzzer1:2", "mega:GND.2", "black", [ "v0" ] ],
+    [ "mega:5V", "relay1:COM", "red", [ "v0" ] ],
+    [ "relay1:NO", "r_heater:1", "green", [ "v0" ] ],
+    [ "r_heater:2", "led_heater:A", "green", [ "v0" ] ],
+    [ "led_heater:C", "mega:GND.2", "black", [ "v0" ] ]
   ],
   "dependencies": {}
 }
