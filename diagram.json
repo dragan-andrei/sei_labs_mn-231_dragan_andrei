@@ -15,8 +15,38 @@
       "type": "wokwi-ntc-temperature-sensor",
       "id": "ntc1",
       "top": 89,
-      "left": -163.8,
+      "left": -192.6,
       "attrs": {}
+    },
+    { "type": "wokwi-relay-module", "id": "relay1", "top": -95.8, "left": 364.8, "attrs": {} },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn_up",
+      "top": -109,
+      "left": -134.4,
+      "attrs": { "color": "green", "label": "UP" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn_down",
+      "top": -109,
+      "left": -38.4,
+      "attrs": { "color": "red", "label": "DOWN" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led_warn",
+      "top": -138,
+      "left": 71,
+      "attrs": { "color": "red" }
+    },
+    { "type": "wokwi-buzzer", "id": "buzzer1", "top": -151.2, "left": 193.8, "attrs": {} },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_led",
+      "top": -101.65,
+      "left": 115.2,
+      "attrs": { "value": "220" }
     }
   ],
   "connections": [
@@ -31,7 +61,19 @@
     [ "mega:21", "lcd1:SCL", "blue", [ "v-28.8", "h69.3", "v268.8", "h-268.8", "v76.8" ] ],
     [ "ntc1:VCC", "mega:5V", "red", [ "h9.6", "v57.6", "h208.9" ] ],
     [ "ntc1:GND", "mega:GND.1", "black", [ "v0" ] ],
-    [ "ntc1:OUT", "mega:A0", "yellow", [ "h28.8", "v105.5", "h233.7" ] ]
+    [ "ntc1:OUT", "mega:A0", "yellow", [ "h28.8", "v105.5", "h233.7" ] ],
+    [ "relay1:VCC", "mega:5V", "red", [ "h-48", "v326.4", "h-184.7" ] ],
+    [ "relay1:GND", "mega:GND.2", "black", [ "h-9.6", "v335.6", "h-213.35" ] ],
+    [ "relay1:IN", "mega:8", "green", [ "h-28.8", "v57.4", "h-191.4" ] ],
+    [ "btn_up:1.l", "mega:10", "green", [ "h-28.8", "v124.8", "h288.3" ] ],
+    [ "btn_up:2.l", "mega:GND.1", "black", [ "h-19.2", "v115.4", "h240.2" ] ],
+    [ "btn_down:1.l", "mega:9", "orange", [ "h-9.6", "v96", "h183.1" ] ],
+    [ "btn_down:2.l", "mega:GND.1", "black", [ "h-19.2", "v96.2", "h144", "v38.4" ] ],
+    [ "led_warn:A", "r_led:1", "red", [ "v0" ] ],
+    [ "r_led:2", "mega:14", "red", [ "v105.6", "h64.1" ] ],
+    [ "led_warn:C", "mega:GND.2", "black", [ "h-76.4", "v355.2", "h132.25" ] ],
+    [ "buzzer1:1", "mega:7", "purple", [ "v57.6", "h-63.2" ] ],
+    [ "buzzer1:2", "mega:GND.2", "black", [ "v0" ] ]
   ],
   "dependencies": {}
 }

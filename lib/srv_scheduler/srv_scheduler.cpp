@@ -25,6 +25,22 @@ void srv_scheduler_init(void)
                 SENSOR_REPORT_TASK_PRIORITY,
                 NULL);
 
+    ctrl_hysteresis_task_init();
+
+    xTaskCreate(ctrl_setpoint_task,
+                "setpoint",
+                SETPOINT_TASK_STACK_SIZE,
+                NULL,
+                SETPOINT_TASK_PRIORITY,
+                NULL);
+
+    xTaskCreate(ctrl_hysteresis_control_task,
+                "hyst_ctrl",
+                HYSTERESIS_TASK_STACK_SIZE,
+                NULL,
+                HYSTERESIS_TASK_PRIORITY,
+                NULL);
+
 }
 
 

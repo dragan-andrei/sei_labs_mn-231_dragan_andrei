@@ -3,6 +3,7 @@
 
 #include "configs.h"
 #include "ctrl_task_sensor.h"
+#include "ctrl_task_hysteresis.h"
 
 void srv_scheduler_init(void);
 void srv_scheduler_run(void);
