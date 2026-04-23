@@ -3,23 +3,44 @@
 
 #include <Arduino.h>
 
-// --- Parametrii pentru Lab 5.2 (PID) ---
-#define POT_PIN A0          // Analog pin pentru SetPoint (potentiometru)
-#define HEATER_PWM_PIN 3    // Pin PWM Arduino Mega pentru LED (incalzitor)
+// ==========================================
+// Configurări pentru ecranul LCD (I2C)
+// ==========================================
+#define LCD_COLS 16  // Numărul de coloane ale LCD-ului (ex: 16 sau 20)
+#define LCD_ROWS 2   // Numărul de rânduri ale LCD-ului (ex: 2 sau 4)
 
-// Parametrii PID (K_p, K_i, K_d)
-#define PID_KP 10.0
-#define PID_KI 0.5
-#define PID_KD 2.0
+// ==========================================
+// Configurări pentru Tastatura Matricială (Keypad)
+// ==========================================
+#define KEYPAD_ROWS 4
+#define KEYPAD_COLS 4
 
-// Parametrii de simulare termica
-#define TEMP_AMBIENT 20.0
+// Pinii la care sunt conectate RÂNDURILE tastaturii
+#define KEYPAD_PIN_1 13
+#define KEYPAD_PIN_2 12
+#define KEYPAD_PIN_3 14
+#define KEYPAD_PIN_4 27
 
-// OS Config
-#define BAUDRATE 115200
+// Pinii la care sunt conectate COLOANELE tastaturii
+#define KEYPAD_PIN_5 26
+#define KEYPAD_PIN_6 25
+#define KEYPAD_PIN_7 33
+#define KEYPAD_PIN_8 32
 
-#define OS_PID_TASK_DELAY_MS 100 // Ticks delay pentru bucla in milisecunde
-#define OS_PID_TASK_STACK_SIZE 256
-#define OS_PID_TASK_PRIORITY 2
+// ==========================================
+// Configurări Hardware de Bază (FSM, LED, Buton)
+// ==========================================
+#define MAIN_PIN_LED 2
+#define MAIN_PIN_BTN 4
 
-#endif
+#define DEBOUNCE_DELAY_MS 50
+
+// ==========================================
+// Configurări FreeRTOS
+// ==========================================
+#define FSM_TASK_STACK_SIZE 2048
+#define FSM_TASK_PRIORITY   1
+#define FSM_TASK_CORE       1
+#define FSM_TASK_DELAY_MS   10
+
+#endif // CONFIGS_H
