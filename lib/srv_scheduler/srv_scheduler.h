@@ -1,13 +1,15 @@
 #ifndef SRV_SCHEDULER_H
 #define SRV_SCHEDULER_H
 
-#include "configs.h"
-#include "ctrl_task_sensor.h"
-#include "ctrl_task_hysteresis.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+// Initializeaza controller-ul RTOS
 void srv_scheduler_init(void);
-void srv_scheduler_run(void);
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SRV_SCHEDULER_H

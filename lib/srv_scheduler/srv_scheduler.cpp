@@ -1,50 +1,28 @@
 #include "srv_scheduler.h"
 
 #include <Arduino_FreeRTOS.h>
+#include <task.h>
 
+#include "configs.h"
 #include "ctrl_stdio.h"
+#include "ctrl_task_pid.h"
 
-
-void srv_scheduler_init(void)
-{
+void srv_scheduler_init(void) {
+    // 1. Inițializăm portul Serial pentru printf (Stdio redirection)
     ctrl_stdio_serial_init();
-    ctrl_stdio_lcd_init();
-    ctrl_sensor_task_init();
 
-    xTaskCreate(ctrl_sensor_acquisition_task,
-                "sensor_acq",
-                SENSOR_ACQUISITION_TASK_STACK_SIZE,
-                NULL,
-                SENSOR_ACQUISITION_TASK_PRIORITY,
-                NULL);
+    // 2. Inițializăm contextul de drivere pentru Controller-ul Principal (PID)
+    ctrl_task_pid_init();
 
-    xTaskCreate(ctrl_sensor_report_task,
-                "sensor_rep",
-                SENSOR_REPORT_TASK_STACK_SIZE,
-                NULL,
-                SENSOR_REPORT_TASK_PRIORITY,
-                NULL);
+    // 3. Creăm Task-ul responsabil cu PID Loop și I/O
+    xTaskCreate(
+        (TaskFunction_t)ctrl_pid_control_loop,
+        "PID_Control",
+        OS_PID_TASK_STACK_SIZE,
+        NULL,
+        OS_PID_TASK_PRIORITY,
+        NULL
+    );
 
-    ctrl_hysteresis_task_init();
-
-    xTaskCreate(ctrl_setpoint_task,
-                "setpoint",
-                SETPOINT_TASK_STACK_SIZE,
-                NULL,
-                SETPOINT_TASK_PRIORITY,
-                NULL);
-
-    xTaskCreate(ctrl_hysteresis_control_task,
-                "hyst_ctrl",
-                HYSTERESIS_TASK_STACK_SIZE,
-                NULL,
-                HYSTERESIS_TASK_PRIORITY,
-                NULL);
-
-}
-
-
-void srv_scheduler_run(void)
-{
-
+    // * Scheduler-ul RTOS din library va porni automat după apelarea main()-ului în platforma Arduino/AVR.
 }
