@@ -91,6 +91,25 @@ void ctrl_stdio_lcd_clear(void)
 }
 
 // ============================================================================
+// GENERIC OUTPUT FUNCTION
+// ============================================================================
+
+void ctrl_stdio_printf(const char *fmt, ...)
+{
+    char buf[128];
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, ap);
+    va_end(ap);
+
+    if (g_output_mode == OUTPUT_LCD) {
+        ctrl_stdio_lcd_print(buf);
+    } else {
+        Serial.print(buf);
+    }
+}
+
+// ============================================================================
 // PUBLIC INIT FUNCTIONS
 // ============================================================================
 

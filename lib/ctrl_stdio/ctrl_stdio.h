@@ -27,5 +27,8 @@ void ctrl_stdio_lcd_print(const char *str);
 void ctrl_stdio_lcd_printf(const char *fmt, ...);
 void ctrl_stdio_lcd_clear(void);
 
+// Generic output function (routes based on g_output_mode)
+void ctrl_stdio_printf(const char *fmt, ...);
+
 #endif
 
