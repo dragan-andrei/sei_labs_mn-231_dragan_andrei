@@ -4,43 +4,50 @@
 #include <Arduino.h>
 
 // ==========================================
-// Configurări pentru ecranul LCD (I2C)
+// CONFIGURAȚII SEMAFOR DIRECȚIA EST-VEST
 // ==========================================
-#define LCD_COLS 16  // Numărul de coloane ale LCD-ului (ex: 16 sau 20)
-#define LCD_ROWS 2   // Numărul de rânduri ale LCD-ului (ex: 2 sau 4)
+#define PIN_LED_EST_R   2   // Pin pentru LED Roșu Est
+#define PIN_LED_EST_Y   4   // Pin pentru LED Galben Est
+#define PIN_LED_EST_G   5   // Pin pentru LED Verde Est
 
 // ==========================================
-// Configurări pentru Tastatura Matricială (Keypad)
+// CONFIGURAȚII SEMAFOR DIRECȚIA NORD-SUD
 // ==========================================
-#define KEYPAD_ROWS 4
-#define KEYPAD_COLS 4
-
-// Pinii la care sunt conectate RÂNDURILE tastaturii
-#define KEYPAD_PIN_1 13
-#define KEYPAD_PIN_2 12
-#define KEYPAD_PIN_3 14
-#define KEYPAD_PIN_4 27
-
-// Pinii la care sunt conectate COLOANELE tastaturii
-#define KEYPAD_PIN_5 26
-#define KEYPAD_PIN_6 25
-#define KEYPAD_PIN_7 33
-#define KEYPAD_PIN_8 32
+#define PIN_LED_NORD_R  18  // Pin pentru LED Roșu Nord
+#define PIN_LED_NORD_Y  19  // Pin pentru LED Galben Nord
+#define PIN_LED_NORD_G  21  // Pin pentru LED Verde Nord
 
 // ==========================================
-// Configurări Hardware de Bază (FSM, LED, Buton)
+// CONFIGURAȚII SENZORI / BUTOANE
 // ==========================================
-#define MAIN_PIN_LED 2
-#define MAIN_PIN_BTN 4
-
-#define DEBOUNCE_DELAY_MS 50
+#define PIN_BTN_NORD    22  // Pin pentru Buton Cerere Nord
 
 // ==========================================
-// Configurări FreeRTOS
+// CONFIGURAȚII COMUNICARE SERIALĂ
 // ==========================================
-#define FSM_TASK_STACK_SIZE 2048
-#define FSM_TASK_PRIORITY   1
-#define FSM_TASK_CORE       1
-#define FSM_TASK_DELAY_MS   10
+#define SERIAL_BAUDRATE 115200
+
+// ==========================================
+// CONFIGURAȚII TEMPORIZARE SEMAFOR (ms)
+// ==========================================
+#define TRAFFIC_EST_REQUEST_HOLD_MS      2000
+#define TRAFFIC_EST_FAILSAFE_TIMEOUT_MS  30000
+#define TRAFFIC_EST_GALBEN_MS            2000
+#define TRAFFIC_ALL_RED_MS               1000
+#define TRAFFIC_NORD_VERDE_MS            5000
+#define TRAFFIC_NORD_GALBEN_MS           2000
+
+// ==========================================
+// CONFIGURAȚII BUTON (ms)
+// ==========================================
+#define BTN_POLL_MS                      50
+#define BTN_DEBOUNCE_MS                  120
+
+// ==========================================
+// CONFIGURAȚII FreeRTOS
+// ==========================================
+#define FSM_SEMAFOR_TASK_STACK_SIZE      2048
+#define FSM_SEMAFOR_BTN_TASK_PRIORITY    1
+#define FSM_SEMAFOR_LOGIC_TASK_PRIORITY  2
 
 #endif // CONFIGS_H

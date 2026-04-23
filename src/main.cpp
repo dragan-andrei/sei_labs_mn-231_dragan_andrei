@@ -1,32 +1,52 @@
 #include <Arduino.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include "dd_button.h"
-#include "dd_led.h"
-#include "ctrl_stdio.h"
-#include "app_fsm.h"
-
 #include "configs.h"
-#include "srv_scheduler.h"
+#include "dd_led.h"
+#include "dd_button.h"
+#include "ctrl_stdio.h"
+#include "app_fsm_semafor.h"
+
+namespace {
+
+constexpr uint8_t kTrafficLedPins[] = {
+    PIN_LED_EST_R,
+    PIN_LED_EST_Y,
+    PIN_LED_EST_G,
+    PIN_LED_NORD_R,
+    PIN_LED_NORD_Y,
+    PIN_LED_NORD_G
+};
+
+void initTrafficLeds() {
+    for (uint8_t pin : kTrafficLedPins) {
+        dd_led_init(pin);
+    }
+}
+
+void printBootBanner() {
+    ctrl_stdio_print_text("\n========================================\n");
+    ctrl_stdio_print_text("   SISTEM SEMAFOR INTELIGENT - ESP32\n");
+    ctrl_stdio_print_text("Directii active:\n");
+    ctrl_stdio_print_text("  - EST-VEST:  AUTO (Principal)\n");
+    ctrl_stdio_print_text("  - NORD-SUD:  PIETONI (Secundar cu Buton)\n");
+    ctrl_stdio_print_text("Control: FSM + FreeRTOS\n");
+    ctrl_stdio_print_text("========================================\n");
+}
+
+} // namespace
 
 void setup() {
-    ctrl_stdio_serial_init();
-    delay(500);
-    
-    // Inițializare hardware FSM
-    app_fsm_init(MAIN_PIN_LED);
-    
-    ctrl_stdio_printf("\n\n=== SISTEM INIȚIALIZAT (ESP32) ===\n");
-    ctrl_stdio_printf("Core RTOS: %d\n", xPortGetCoreID());
-    ctrl_stdio_printf("LED Pin: %d | Button Pin: %d\n", MAIN_PIN_LED, MAIN_PIN_BTN);
+    ctrl_stdio_init(SERIAL_BAUDRATE);
 
-    // Pornește scheduler-ul pentru task-urile FSM
-    srv_scheduler_init();
+    printBootBanner();
+    initTrafficLeds();
+    dd_button_init(PIN_BTN_NORD);
+    app_semafor_init();
+
+    ctrl_stdio_print_text("Sistem pornit: asteptam pietonii (NORD) sa apese butonul.\n");
 }
 
 void loop() {
-    // În mediul ESP32, funcția loop() rulează ca un task FreeRTOS separat.
-    // Lăsăm acest task (loopTask) să doarmă, pentru a economisi resurse,
-    // deoarece logica noastră rulează în FSM_Task creat mai sus.
-    vTaskDelete(NULL); 
+    // In FreeRTOS pe ESP32, logica este rulata in task-uri.
+    vTaskDelete(NULL);
 }
+
