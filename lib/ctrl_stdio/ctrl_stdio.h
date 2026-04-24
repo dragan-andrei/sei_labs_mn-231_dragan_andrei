@@ -1,13 +1,21 @@
-#ifndef ctrl_stdio_h
-#define ctrl_stdio_h
+#ifndef CTRL_STDIO_H
+#define CTRL_STDIO_H
 
 #include <Arduino.h>
-#include <stdio.h>
 
-#define BAUDRATE 115200
+// Inițializează comunicarea serială
+void ctrl_stdio_init(unsigned long baudrate);
 
-void ctrl_stdio_init();
+// Afișează un șir de caractere (text brut) cu normalizare CR+LF
+void ctrl_stdio_print_text(const char* text);
 
+// Alias de compatibilitate
+void ctrl_stdio_print(const char* text);
 
-#endif
+// Trece pe un rând nou
+void ctrl_stdio_print_newline();
 
+// Funcție generică tip printf (buffer intern 160 de octeți)
+void ctrl_stdio_printf(const char* fmt, ...);
+
+#endif // CTRL_STDIO_H
