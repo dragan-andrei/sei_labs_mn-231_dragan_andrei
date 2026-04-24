@@ -1,38 +1,41 @@
 {
   "version": 1,
-  "author": "Dragan Andrei",
+  "author": "dragan-andrei",
   "editor": "wokwi",
   "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
     {
-      "type": "wokwi-arduino-mega",
-      "id": "mega",
-      "top": -1.6,
-      "left": 74.2,
-      "rotate": 90,
-      "attrs": {}
+      "type": "wokwi-dht22",
+      "id": "dht1",
+      "top": -182.1,
+      "left": -72.6,
+      "attrs": { "temperature": "24", "humidity": "55" }
     },
-    { "type": "wokwi-led", "id": "led1", "top": -42, "left": 3.8, "attrs": { "color": "red" } },
+    {
+      "type": "wokwi-led",
+      "id": "led_actuator",
+      "top": 20.8,
+      "left": -168.6,
+      "rotate": 180,
+      "attrs": { "color": "green" }
+    },
     {
       "type": "wokwi-resistor",
-      "id": "r1",
-      "top": 3.95,
-      "left": 105.6,
+      "id": "r_led",
+      "top": 20,
+      "left": -240,
       "attrs": { "value": "220" }
-    },
-    {
-      "type": "wokwi-pushbutton",
-      "id": "btn1",
-      "top": 35,
-      "left": -48,
-      "attrs": { "color": "green", "xray": "1" }
     }
   ],
   "connections": [
-    [ "r1:1", "led1:A", "red", [ "v0" ] ],
-    [ "led1:C", "mega:GND.1", "black", [ "v19.2", "h0.4" ] ],
-    [ "r1:2", "mega:12", "red", [ "v0" ] ],
-    [ "btn1:1.r", "mega:GND.1", "black", [ "v0", "h355.4", "v-28.8" ] ],
-    [ "btn1:2.r", "mega:10", "red", [ "h355.4", "v-9.4" ] ]
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "dht1:VCC", "esp:3V3", "red", [ "v48", "v48" ] ],
+    [ "dht1:GND", "esp:GND.1", "black", [ "v38.4", "v182.4" ] ],
+    [ "dht1:SDA", "esp:4", "green", [ "v57.6", "h172.9", "v153.6" ] ],
+    [ "esp:2", "r_led:1", "green", [ "h24.04", "v67.2", "h-364.8" ] ],
+    [ "r_led:2", "led_actuator:A", "green", [] ],
+    [ "led_actuator:C", "esp:GND.2", "black", [ "v-67.2", "h244.36" ] ]
   ],
   "dependencies": {}
 }
