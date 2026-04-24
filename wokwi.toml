@@ -1,4 +1,4 @@
 [wokwi]
-version = 1
-firmware = '.pio\build\megaatmega2560\firmware.hex'
-elf = '.pio\build\megaatmega2560\firmware.elf'
+version  = 1
+firmware = '.pio/build/esp32_demo/firmware.bin'
+elf      = '.pio/build/esp32_demo/firmware.elf'
