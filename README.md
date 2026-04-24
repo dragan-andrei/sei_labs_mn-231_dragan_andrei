@@ -157,21 +157,27 @@ pio device monitor -e esp32_master
 
 ### 6.1 Simulare în Wokwi (build `esp32_demo`)
 
-Pentru a verifica protocolul end-to-end fără hardware, `wokwi.toml` pornește
-build-ul `esp32_demo`: un singur firmware care rulează SIMULTAN master-ul (pe
-`Wire` / GPIO 21-22) și slave-ul (pe `Wire1` / GPIO 16-17), cele două magistrale
-fiind unite prin jumperi externi în `diagram.json`:
+Wokwi VS Code rulează DOAR o imagine firmware per simulare, iar suportul pentru
+modul I²C slave pe ESP32 din simulator este parțial — două magistrale hardware
+legate prin jumperi externi nu se sincronizează corect. Pentru a putea totuși
+observa protocolul complet (encode / checksum / decode / task-uri FreeRTOS /
+mutex / alerta de proximitate) într-o singură fereastră serial, build-ul
+`esp32_demo` folosește o **magistrală virtuală in-process**:
 
-```
-   [Master / Wire / I2C0]   [Slave / Wire1 / I2C1]
-         SDA  21 ─────────────────── 16  SDA
-         SCL  22 ─────────────────── 17  SCL
-```
+- slave-ul rulează normal (task-uri FreeRTOS, mutex, buffer encodat) dar fără
+  a mai apela `Wire.begin(addr, ...)` hardware;
+- master-ul de demo citește direct buffer-ul encodat prin
+  `app_i2c_slave_peek_response()` (sub mutex), rulează exact același
+  `ctrl_i2c_packet_decode` și afișează rezultatul.
 
-În același terminal serial se văd atât liniile `[SLAVE] refresh buffer ...` cât
-și `[MASTER] --- interogare slave 0x42 ---` / `Pachet OK — HEAD=0xAA ...`.
+Toată logica protocolului (HEAD/LENGTH/PAYLOAD/CHECKSUM, RTOS, mutex, alerta de
+proximitate) este exercitată; singurul element "fake" este transportul pe fir.
+Pentru demonstrația fizică a lucrării se folosesc env-urile `esp32_master` /
+`esp32_slave` flash-uite pe două plăci distincte — acolo comunicația trece prin
+I²C real prin Wire.
+
 Mișcând slider-ul de pe HC-SR04 sub 15 cm se vede aprinzându-se LED-ul de alertă
-și apare linia `>>> ALERTA PROXIMITATE <<<`.
+pe GPIO 2 și apare linia `>>> ALERTA PROXIMITATE <<<` în serial.
 
 ## 7. Mapare la cerințele lucrării
 

@@ -139,11 +139,6 @@ void app_i2c_slave_init(TwoWire* bus,
                         uint8_t sda_pin,
                         uint8_t scl_pin,
                         uint8_t slave_address) {
-    if (bus == nullptr) {
-        ctrl_stdio_print_text("[SLAVE][EROARE] bus == nullptr!\n");
-        return;
-    }
-
     for (uint8_t i = 0; i < HCSR04_SENSOR_COUNT; ++i) {
         dd_hcsr04_init(&g_sensors[i]);
     }
@@ -157,9 +152,11 @@ void app_i2c_slave_init(TwoWire* bus,
     g_bus        = bus;
     g_slave_addr = slave_address;
 
-    g_bus->begin(slave_address, sda_pin, scl_pin, I2C_BUS_CLOCK_HZ);
-    g_bus->onReceive(on_i2c_receive_event);
-    g_bus->onRequest(on_i2c_request_event);
+    if (bus != nullptr) {
+        bus->begin(slave_address, sda_pin, scl_pin, I2C_BUS_CLOCK_HZ);
+        bus->onReceive(on_i2c_receive_event);
+        bus->onRequest(on_i2c_request_event);
+    }
 
     const BaseType_t sampler_ok = xTaskCreate(
         task_sensor_sampler,
@@ -182,10 +179,36 @@ void app_i2c_slave_init(TwoWire* bus,
         return;
     }
 
-    ctrl_stdio_printf(
-        "[SLAVE] gata. Adresa 0x%02X (SDA=%u, SCL=%u), %u senzori HC-SR04.\n",
-        static_cast<unsigned>(slave_address),
-        static_cast<unsigned>(sda_pin),
-        static_cast<unsigned>(scl_pin),
-        static_cast<unsigned>(HCSR04_SENSOR_COUNT));
+    if (bus != nullptr) {
+        ctrl_stdio_printf(
+            "[SLAVE] gata. Adresa 0x%02X (SDA=%u, SCL=%u), %u senzori HC-SR04.\n",
+            static_cast<unsigned>(slave_address),
+            static_cast<unsigned>(sda_pin),
+            static_cast<unsigned>(scl_pin),
+            static_cast<unsigned>(HCSR04_SENSOR_COUNT));
+    } else {
+        ctrl_stdio_printf(
+            "[SLAVE] gata (DEMO / magistrală virtuală), %u senzori HC-SR04.\n",
+            static_cast<unsigned>(HCSR04_SENSOR_COUNT));
+    }
+}
+
+size_t app_i2c_slave_peek_response(uint8_t* out, size_t capacity) {
+    if (out == nullptr || g_data_mutex == nullptr) {
+        return 0;
+    }
+    // Timeout generos în context de task (demo-ul rulează la 500 ms — suficient).
+    if (xSemaphoreTake(g_data_mutex,
+                       pdMS_TO_TICKS(MUTEX_BLOCK_TIMEOUT_MS)) != pdTRUE) {
+        return 0;
+    }
+    size_t n = g_response_length;
+    if (n > capacity) {
+        n = capacity;
+    }
+    for (size_t i = 0; i < n; ++i) {
+        out[i] = g_response_buffer[i];
+    }
+    xSemaphoreGive(g_data_mutex);
+    return n;
 }
