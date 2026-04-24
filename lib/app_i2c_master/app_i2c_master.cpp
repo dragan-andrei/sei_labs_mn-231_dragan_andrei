@@ -1,6 +1,5 @@
 #include "app_i2c_master.h"
 
-#include <Wire.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
@@ -11,13 +10,20 @@
 
 namespace {
 
+TwoWire* g_bus         = nullptr;
+uint8_t  g_slave_addr  = 0;
+
 // Trimite comanda READ_ALL și citește răspunsul complet.
 // Returnează numărul de octeți primiți (0 în caz de eroare).
 size_t request_sensor_packet(uint8_t* buffer, size_t capacity) {
+    if (g_bus == nullptr) {
+        return 0;
+    }
+
     // Faza 1: notificare comandă (master -> slave)
-    Wire.beginTransmission(I2C_SLAVE_ADDRESS);
-    Wire.write(static_cast<uint8_t>(I2C_CMD_READ_ALL));
-    const uint8_t tx_status = Wire.endTransmission();
+    g_bus->beginTransmission(g_slave_addr);
+    g_bus->write(static_cast<uint8_t>(I2C_CMD_READ_ALL));
+    const uint8_t tx_status = g_bus->endTransmission();
     if (tx_status != 0) {
         ctrl_stdio_printf(
             "[MASTER][ERR] endTransmission status=%u (slave indisponibil)\n",
@@ -28,8 +34,8 @@ size_t request_sensor_packet(uint8_t* buffer, size_t capacity) {
     // Faza 2: cerere date (slave -> master)
     const size_t expected = I2C_PACKET_OVERHEAD +
                             (HCSR04_SENSOR_COUNT * sizeof(uint16_t));
-    const size_t received_count = Wire.requestFrom(
-        static_cast<int>(I2C_SLAVE_ADDRESS),
+    const size_t received_count = g_bus->requestFrom(
+        static_cast<int>(g_slave_addr),
         static_cast<int>(expected));
 
     if (received_count == 0 || received_count > capacity) {
@@ -37,8 +43,8 @@ size_t request_sensor_packet(uint8_t* buffer, size_t capacity) {
     }
 
     size_t idx = 0;
-    while (Wire.available() > 0 && idx < capacity) {
-        buffer[idx++] = static_cast<uint8_t>(Wire.read());
+    while (g_bus->available() > 0 && idx < capacity) {
+        buffer[idx++] = static_cast<uint8_t>(g_bus->read());
     }
     return idx;
 }
@@ -83,7 +89,7 @@ void task_master_poller(void* parameters) {
         ctrl_stdio_printf(
             "\n[%6lu][MASTER] --- interogare slave 0x%02X ---\n",
             millis(),
-            static_cast<unsigned>(I2C_SLAVE_ADDRESS));
+            static_cast<unsigned>(g_slave_addr));
 
         const size_t n = request_sensor_packet(rx_buffer, sizeof(rx_buffer));
         if (n == 0) {
@@ -122,9 +128,20 @@ void task_master_poller(void* parameters) {
 
 }  // namespace
 
-void app_i2c_master_init() {
+void app_i2c_master_init(TwoWire* bus,
+                         uint8_t sda_pin,
+                         uint8_t scl_pin,
+                         uint8_t slave_address) {
+    if (bus == nullptr) {
+        ctrl_stdio_print_text("[MASTER][EROARE] bus == nullptr!\n");
+        return;
+    }
+
+    g_bus        = bus;
+    g_slave_addr = slave_address;
+
     dd_led_init(ALERT_LED_PIN);
-    Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, I2C_BUS_CLOCK_HZ);
+    g_bus->begin(sda_pin, scl_pin, I2C_BUS_CLOCK_HZ);
 
     const BaseType_t ok = xTaskCreate(
         task_master_poller,
@@ -140,7 +157,9 @@ void app_i2c_master_init() {
     }
 
     ctrl_stdio_printf(
-        "[MASTER] gata. Voi interoga 0x%02X la fiecare %u ms.\n",
-        static_cast<unsigned>(I2C_SLAVE_ADDRESS),
+        "[MASTER] gata. Voi interoga 0x%02X (SDA=%u, SCL=%u) la fiecare %u ms.\n",
+        static_cast<unsigned>(slave_address),
+        static_cast<unsigned>(sda_pin),
+        static_cast<unsigned>(scl_pin),
         static_cast<unsigned>(MASTER_POLL_PERIOD_MS));
 }

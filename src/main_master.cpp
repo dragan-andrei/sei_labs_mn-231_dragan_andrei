@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Wire.h>
 
 #include "app_i2c_master.h"
 #include "configs.h"
@@ -18,7 +19,7 @@ void print_boot_banner() {
 void setup() {
     ctrl_stdio_init(SERIAL_BAUDRATE);
     print_boot_banner();
-    app_i2c_master_init();
+    app_i2c_master_init(&Wire, I2C_SDA_PIN, I2C_SCL_PIN, I2C_SLAVE_ADDRESS);
 }
 
 void loop() {

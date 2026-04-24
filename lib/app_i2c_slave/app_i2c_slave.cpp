@@ -1,6 +1,5 @@
 #include "app_i2c_slave.h"
 
-#include <Wire.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/semphr.h>
@@ -18,46 +17,50 @@ const hcsr04_sensor_t g_sensors[HCSR04_SENSOR_COUNT] = {
     { HCSR04_S2_TRIG_PIN, HCSR04_S2_ECHO_PIN },
 };
 
-// Ultimele citiri valide de la senzori (protejate de mutex-ul de mai jos)
+// Ultimele citiri valide de la senzori (protejate de mutex)
 uint16_t g_latest_distance_cm[HCSR04_SENSOR_COUNT] = {
     HCSR04_DISTANCE_ERROR,
     HCSR04_DISTANCE_ERROR,
 };
 
 // Buffer deja codificat pentru răspuns I²C — pre-calculat pentru a minimiza
-// timpul petrecut în ISR-ul onRequest.
+// timpul petrecut în callback-ul onRequest.
 uint8_t g_response_buffer[I2C_PACKET_MAX_SIZE];
 size_t  g_response_length = 0;
 
 SemaphoreHandle_t g_data_mutex = nullptr;
+TwoWire*          g_bus        = nullptr;
+uint8_t           g_slave_addr = 0;
 
 void on_i2c_receive_event(int byte_count) {
-    // Masterul trimite 1 octet: codul de comandă. Îl consumăm din FIFO-ul Wire
-    // (momentan e folosit doar I2C_CMD_READ_ALL, dar structura permite extensii).
-    while (Wire.available() > 0) {
-        (void)Wire.read();
+    if (g_bus == nullptr) {
+        return;
+    }
+    // Master-ul trimite 1 octet: codul de comandă. Îl consumăm din FIFO.
+    // Momentan e suportat doar I2C_CMD_READ_ALL, dar structura permite extensii.
+    while (g_bus->available() > 0) {
+        (void)g_bus->read();
     }
     (void)byte_count;
 }
 
 void on_i2c_request_event() {
-    // Pe ESP32 callback-urile Wire sunt invocate dintr-un task dedicat al
-    // driverului I²C (nu dintr-un ISR pur), deci este sigur să preluăm
-    // mutex-ul cu timeout mic. Dacă buffer-ul este momentan actualizat de
-    // task-ul de refresh, renunțăm la răspuns (master-ul va re-interoga).
-    if (g_data_mutex == nullptr) {
+    if (g_bus == nullptr || g_data_mutex == nullptr) {
         return;
     }
+    // Pe ESP32 callback-urile Wire rulează într-un task dedicat al driverului
+    // I²C, deci putem prelua mutex-ul (timeout 0). Dacă buffer-ul este momentan
+    // rescris de task-ul de refresh, renunțăm la răspuns — master-ul va
+    // re-interoga în ciclul următor. Astfel evităm pachete corupte.
     if (xSemaphoreTake(g_data_mutex, 0) != pdTRUE) {
         return;
     }
     if (g_response_length > 0) {
-        Wire.write(g_response_buffer, g_response_length);
+        g_bus->write(g_response_buffer, g_response_length);
     }
     xSemaphoreGive(g_data_mutex);
 }
 
-// Task: achiziție periodică a distanței de la fiecare senzor.
 void task_sensor_sampler(void* parameters) {
     (void)parameters;
     TickType_t last_wake = xTaskGetTickCount();
@@ -77,9 +80,6 @@ void task_sensor_sampler(void* parameters) {
     }
 }
 
-// Task: serializează citirile curente în buffer-ul de răspuns I²C.
-// Separarea față de task-ul de achiziție permite ca encoder-ul să ruleze la
-// altă frecvență (sau să fie reutilizat pentru alt transport).
 void task_buffer_refresh(void* parameters) {
     (void)parameters;
     TickType_t last_wake = xTaskGetTickCount();
@@ -115,11 +115,17 @@ void task_buffer_refresh(void* parameters) {
             g_response_length = written;
             xSemaphoreGive(g_data_mutex);
 
+            const unsigned payload_bytes =
+                static_cast<unsigned>(written) -
+                static_cast<unsigned>(I2C_PACKET_OVERHEAD);
+
             ctrl_stdio_printf(
-                "[%6lu][SLAVE] refresh buffer: S1=%u cm, S2=%u cm (payload=%u B)\n",
+                "[%6lu][SLAVE] refresh buffer: S1=%u cm, S2=%u cm "
+                "(payload=%u B, total=%u B)\n",
                 millis(),
                 static_cast<unsigned>(snapshot[0]),
                 static_cast<unsigned>(snapshot[1]),
+                payload_bytes,
                 static_cast<unsigned>(written));
         }
 
@@ -129,7 +135,15 @@ void task_buffer_refresh(void* parameters) {
 
 }  // namespace
 
-void app_i2c_slave_init() {
+void app_i2c_slave_init(TwoWire* bus,
+                        uint8_t sda_pin,
+                        uint8_t scl_pin,
+                        uint8_t slave_address) {
+    if (bus == nullptr) {
+        ctrl_stdio_print_text("[SLAVE][EROARE] bus == nullptr!\n");
+        return;
+    }
+
     for (uint8_t i = 0; i < HCSR04_SENSOR_COUNT; ++i) {
         dd_hcsr04_init(&g_sensors[i]);
     }
@@ -140,9 +154,12 @@ void app_i2c_slave_init() {
         return;
     }
 
-    Wire.begin(I2C_SLAVE_ADDRESS, I2C_SDA_PIN, I2C_SCL_PIN, I2C_BUS_CLOCK_HZ);
-    Wire.onReceive(on_i2c_receive_event);
-    Wire.onRequest(on_i2c_request_event);
+    g_bus        = bus;
+    g_slave_addr = slave_address;
+
+    g_bus->begin(slave_address, sda_pin, scl_pin, I2C_BUS_CLOCK_HZ);
+    g_bus->onReceive(on_i2c_receive_event);
+    g_bus->onRequest(on_i2c_request_event);
 
     const BaseType_t sampler_ok = xTaskCreate(
         task_sensor_sampler,
@@ -166,7 +183,9 @@ void app_i2c_slave_init() {
     }
 
     ctrl_stdio_printf(
-        "[SLAVE] gata. Adresa 0x%02X, %u senzori HC-SR04.\n",
-        static_cast<unsigned>(I2C_SLAVE_ADDRESS),
+        "[SLAVE] gata. Adresa 0x%02X (SDA=%u, SCL=%u), %u senzori HC-SR04.\n",
+        static_cast<unsigned>(slave_address),
+        static_cast<unsigned>(sda_pin),
+        static_cast<unsigned>(scl_pin),
         static_cast<unsigned>(HCSR04_SENSOR_COUNT));
 }

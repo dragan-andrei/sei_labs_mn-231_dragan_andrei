@@ -92,11 +92,12 @@ lib/
   app_i2c_slave/              # Task-uri FreeRTOS + Wire onRequest/onReceive
   app_i2c_master/             # Task FreeRTOS poller + afișare
 src/
-  main_master.cpp             # Entry point pentru env esp32_master
-  main_slave.cpp              # Entry point pentru env esp32_slave
-platformio.ini                # Două environment-uri selectate prin build_src_filter
-diagram.json                  # Circuit Wokwi (2 × ESP32 + 2 × HC-SR04)
-wokwi.toml                    # Target implicit pentru simulator
+  main_master.cpp             # Entry point pentru env esp32_master (placă fizică)
+  main_slave.cpp              # Entry point pentru env esp32_slave  (placă fizică)
+  main_demo.cpp               # Entry point pentru env esp32_demo (loopback Wokwi)
+platformio.ini                # Trei environment-uri selectate prin build_src_filter
+diagram.json                  # Circuit Wokwi pentru build-ul esp32_demo (loopback I2C0↔I2C1)
+wokwi.toml                    # Țintește `esp32_demo` pentru simulare
 ```
 
 Principii respectate:
@@ -143,19 +144,34 @@ pe consola serială apare linia `>>> ALERTA PROXIMITATE: obiect sub prag! <<<`.
 ## 6. Build & flash
 
 ```bash
-# Compilare ambele imagini (implicit)
+# Compilare toate imaginile (implicit): master, slave și demo de simulare
 pio run
 
-# Flash separat pe fiecare placă (cablu USB pe rând)
+# Flash separat pe fiecare placă fizică (cablu USB pe rând)
 pio run -e esp32_master -t upload
 pio run -e esp32_slave  -t upload
 
-# Serial monitor (master – afișează distanțele și pachetele valide)
+# Serial monitor pe master (vede pachetele valide și alerta de proximitate)
 pio device monitor -e esp32_master
 ```
 
-Pentru simularea în Wokwi se compilează default `esp32_slave` și diagrama
-furnizează două plăci ESP32 conectate pe I²C.
+### 6.1 Simulare în Wokwi (build `esp32_demo`)
+
+Pentru a verifica protocolul end-to-end fără hardware, `wokwi.toml` pornește
+build-ul `esp32_demo`: un singur firmware care rulează SIMULTAN master-ul (pe
+`Wire` / GPIO 21-22) și slave-ul (pe `Wire1` / GPIO 16-17), cele două magistrale
+fiind unite prin jumperi externi în `diagram.json`:
+
+```
+   [Master / Wire / I2C0]   [Slave / Wire1 / I2C1]
+         SDA  21 ─────────────────── 16  SDA
+         SCL  22 ─────────────────── 17  SCL
+```
+
+În același terminal serial se văd atât liniile `[SLAVE] refresh buffer ...` cât
+și `[MASTER] --- interogare slave 0x42 ---` / `Pachet OK — HEAD=0xAA ...`.
+Mișcând slider-ul de pe HC-SR04 sub 15 cm se vede aprinzându-se LED-ul de alertă
+și apare linia `>>> ALERTA PROXIMITATE <<<`.
 
 ## 7. Mapare la cerințele lucrării
 

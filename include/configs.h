@@ -19,6 +19,14 @@
 // Cod comenzi transmise de Master către Slave (1 octet)
 #define I2C_CMD_READ_ALL                0xA1     // Citește toți senzorii (pachet compact)
 
+// Pini folosiți DOAR în build-ul `esp32_demo` (master + slave pe același chip,
+// conectați prin loopback intern în diagrama Wokwi).
+// Master-ul rulează pe I²C-ul 0 (Wire), slave-ul pe I²C-ul 1 (Wire1).
+#define I2C_DEMO_MASTER_SDA_PIN         21
+#define I2C_DEMO_MASTER_SCL_PIN         22
+#define I2C_DEMO_SLAVE_SDA_PIN          16
+#define I2C_DEMO_SLAVE_SCL_PIN          17
+
 // ==========================================================================
 // CONFIGURAȚII SENZOR ULTRASONIC (HC-SR04) — doar pentru Slave
 // ==========================================================================

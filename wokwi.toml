@@ -1,8 +1,13 @@
 [wokwi]
 version = 1
 
-# Wokwi simulează un singur firmware pe placa „slave".
-# Pentru testare fizică dual-MCU se rulează `pio run -e esp32_master`
-# respectiv `pio run -e esp32_slave` și se încarcă pe plăci separate.
-firmware = '.pio/build/esp32_slave/firmware.bin'
-elf      = '.pio/build/esp32_slave/firmware.elf'
+# Wokwi simulează o singură imagine firmware pe un ESP32.
+# Folosim build-ul `esp32_demo` care rulează MASTER pe Wire (GPIO 21/22) și
+# SLAVE pe Wire1 (GPIO 16/17), cele două magistrale fiind unite prin jumperi
+# în `diagram.json`. Astfel protocolul I²C complet este observabil din Wokwi.
+#
+# Pentru demonstrația fizică pe două plăci se folosesc separat:
+#   pio run -e esp32_master -t upload
+#   pio run -e esp32_slave  -t upload
+firmware = '.pio/build/esp32_demo/firmware.bin'
+elf      = '.pio/build/esp32_demo/firmware.elf'
