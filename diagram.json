@@ -3,62 +3,81 @@
   "author": "dragan-andrei",
   "editor": "wokwi",
   "parts": [
-    {
-      "type": "board-esp32-devkit-c-v4",
-      "id": "esp",
-      "top": 0,
-      "left": 0,
-      "attrs": {}
-    },
+    { "type": "board-esp32-devkit-c-v4", "id": "slave",  "top": 0, "left": -250, "attrs": {} },
+    { "type": "board-esp32-devkit-c-v4", "id": "master", "top": 0, "left":  150, "attrs": {} },
     {
       "type": "wokwi-hc-sr04",
       "id": "us1",
-      "top": -160,
-      "left": -220,
+      "top": -276.9,
+      "left": -176.9,
       "attrs": { "distance": "60" }
     },
     {
       "type": "wokwi-hc-sr04",
       "id": "us2",
-      "top": -160,
-      "left": -60,
+      "top": -276.9,
+      "left": 15.1,
       "attrs": { "distance": "200" }
     },
     {
       "type": "wokwi-led",
       "id": "led_alert",
-      "top": 0,
-      "left": 300,
+      "top": -50,
+      "left": 350,
       "attrs": { "color": "red" }
     },
     {
       "type": "wokwi-resistor",
       "id": "r_alert",
-      "top": 20,
-      "left": 260,
+      "top": 23.45,
+      "left": 382.6,
+      "rotate": 180,
       "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_sda",
+      "top": 263.45,
+      "left": 37,
+      "rotate": 180,
+      "attrs": { "value": "4700" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_scl",
+      "top": 292.25,
+      "left": -87.8,
+      "rotate": 180,
+      "attrs": { "value": "4700" }
     }
   ],
   "connections": [
-    [ "esp:TX", "$serialMonitor:RX", "", [] ],
-    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "slave:TX", "$serialMonitor:RX", "", [] ],
+    [ "slave:RX", "$serialMonitor:TX", "", [] ],
 
-    [ "us1:VCC",  "esp:5V",    "red",   [] ],
-    [ "us1:GND",  "esp:GND.1", "black", [] ],
-    [ "us1:TRIG", "esp:5",     "green", [] ],
-    [ "us1:ECHO", "esp:18",    "gold",  [] ],
+    [ "us1:VCC",  "slave:5V",    "red",   [ "v76.8",  "h-153.6", "v307.2" ] ],
+    [ "us1:GND",  "slave:GND.1", "black", [ "v9.6",   "h-193.2", "v326.4" ] ],
+    [ "us1:TRIG", "slave:5",     "green", [ "v38.4",  "h-53.64" ] ],
+    [ "us1:ECHO", "slave:18",    "gold",  [ "v57.6",  "h-39.2",  "v230.4" ] ],
 
-    [ "us2:VCC",  "esp:5V",    "red",   [] ],
-    [ "us2:GND",  "esp:GND.1", "black", [] ],
-    [ "us2:TRIG", "esp:19",    "green", [] ],
-    [ "us2:ECHO", "esp:23",    "gold",  [] ],
+    [ "us2:VCC",  "slave:5V",    "red",   [ "v28.8",  "h-393.6", "v355.2" ] ],
+    [ "us2:GND",  "slave:GND.1", "black", [ "v19.2",  "h-442.8", "v297.6" ] ],
+    [ "us2:TRIG", "slave:19",    "green", [ "v48",    "h-278.8", "v230.4" ] ],
+    [ "us2:ECHO", "slave:23",    "gold",  [ "v38.4",  "h-173.6", "v182.4" ] ],
 
-    [ "esp:21", "esp:16", "blue", [ "v48", "h-96", "v48", "h96" ] ],
-    [ "esp:22", "esp:17", "cyan", [ "v64", "h-96", "v32", "h96" ] ],
+    [ "slave:21", "master:21", "blue", [ "h43.64",  "v-19.2",  "h356.36" ] ],
+    [ "slave:22", "master:22", "cyan", [ "h120.44", "v-105.6", "h326.4", "v105.6" ] ],
 
-    [ "esp:2",        "r_alert:1",    "green", [] ],
-    [ "r_alert:2",    "led_alert:A",  "green", [] ],
-    [ "led_alert:C",  "esp:GND.2",    "black", [] ]
+    [ "r_sda:1", "slave:21",  "blue", [ "h9.6", "v-182.4", "h-211.2", "v-9.6" ] ],
+    [ "r_sda:2", "slave:3V3", "red",  [ "v-278.4", "h-282.59" ] ],
+    [ "r_scl:1", "slave:22",  "cyan", [ "v0" ] ],
+    [ "r_scl:2", "slave:3V3", "red",  [ "v0" ] ],
+
+    [ "slave:GND.2", "master:GND.2", "black", [ "h-148.36", "v-57.6", "h576", "v57.6" ] ],
+
+    [ "slave:2",     "r_alert:1",    "green", [ "h240" ] ],
+    [ "r_alert:2",   "led_alert:A",  "green", [] ],
+    [ "led_alert:C", "master:GND.1", "black", [] ]
   ],
   "dependencies": {}
 }
