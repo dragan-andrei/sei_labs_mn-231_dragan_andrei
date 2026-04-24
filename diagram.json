@@ -7,8 +7,8 @@
     { "type": "board-esp32-devkit-c-v4", "id": "slave",  "top": 0, "left":  120, "attrs": {} }
   ],
   "connections": [
-    [ "master:TX0", "$serialMonitor:RX", "", [] ],
-    [ "master:RX0", "$serialMonitor:TX", "", [] ],
+    [ "master:TX", "$serialMonitor:RX", "", [] ],
+    [ "master:RX", "$serialMonitor:TX", "", [] ],
 
     [ "master:17", "slave:16",  "green", [ "v-67.2", "h384", "v67.2" ] ],
     [ "master:16", "slave:17",  "gold",  [ "v-96",   "h432", "v96" ] ],
