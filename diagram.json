@@ -7,15 +7,16 @@
     {
       "type": "wokwi-dht22",
       "id": "dht1",
-      "top": -110,
-      "left": 180,
+      "top": -182.1,
+      "left": -72.6,
       "attrs": { "temperature": "24", "humidity": "55" }
     },
     {
       "type": "wokwi-led",
       "id": "led_actuator",
-      "top": -40,
-      "left": -200,
+      "top": 20.8,
+      "left": -168.6,
+      "rotate": 180,
       "attrs": { "color": "green" }
     },
     {
@@ -27,16 +28,14 @@
     }
   ],
   "connections": [
-    [ "esp:TX",  "$serialMonitor:RX", "", [] ],
-    [ "esp:RX",  "$serialMonitor:TX", "", [] ],
-
-    [ "dht1:VCC", "esp:3V3",   "red",    [] ],
-    [ "dht1:GND", "esp:GND.1", "black",  [] ],
-    [ "dht1:SDA", "esp:4",     "green",  [] ],
-
-    [ "esp:2",         "r_led:1",         "green", [] ],
-    [ "r_led:2",       "led_actuator:A",  "green", [] ],
-    [ "led_actuator:C","esp:GND.2",       "black", [] ]
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "dht1:VCC", "esp:3V3", "red", [ "v48", "v48" ] ],
+    [ "dht1:GND", "esp:GND.1", "black", [ "v38.4", "v182.4" ] ],
+    [ "dht1:SDA", "esp:4", "green", [ "v57.6", "h172.9", "v153.6" ] ],
+    [ "esp:2", "r_led:1", "green", [ "h24.04", "v67.2", "h-364.8" ] ],
+    [ "r_led:2", "led_actuator:A", "green", [] ],
+    [ "led_actuator:C", "esp:GND.2", "black", [ "v-67.2", "h244.36" ] ]
   ],
   "dependencies": {}
 }
