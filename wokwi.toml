@@ -1,4 +1,8 @@
 [wokwi]
 version = 1
-firmware = '.pio\build\megaatmega2560\firmware.hex'
-elf = '.pio\build\megaatmega2560\firmware.elf'
+
+# Wokwi simulează un singur firmware pe placa „slave".
+# Pentru testare fizică dual-MCU se rulează `pio run -e esp32_master`
+# respectiv `pio run -e esp32_slave` și se încarcă pe plăci separate.
+firmware = '.pio/build/esp32_slave/firmware.bin'
+elf      = '.pio/build/esp32_slave/firmware.elf'
